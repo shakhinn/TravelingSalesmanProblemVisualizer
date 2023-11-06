@@ -46,20 +46,13 @@ for i in range(n): matrix[i][i] = float('inf')
 while True:
     # Редуцируем
     # --------------------------------------
-    # Вычитаем минимальный элемент в строках
     for i in range(len(matrix)):
-        temp = min(matrix[i])
-        H += temp
+        min_row = min(matrix[i])
+        min_column = min(row[i] for row in matrix)
+        H += min_row + min_column
         for j in range(len(matrix)):
-            matrix[i][j] -= temp
-
-    # Вычитаем минимальный элемент в столбцах
-    for i in range(len(matrix)):
-        temp = min(row[i] for row in matrix)
-        H += temp
-        for j in range(len(matrix)):
-            matrix[j][i] -= temp
-    # --------------------------------------
+            matrix[i][j] -= min_row
+            matrix[j][i] -= min_column
 
     # Оцениваем нулевые клетки и ищем нулевую клетку с максимальной оценкой
     # --------------------------------------
