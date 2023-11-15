@@ -19,8 +19,28 @@ def PrintMatrix(matrix):
     print("---------------")
 
 
+# Редукция матрицы
+def reduceMatrix(myMatrix, H_0, Hk_1):
+    for i in range(len(myMatrix)):
+        temp = min(myMatrix[i])
+        H_0 += temp
+        for j in range(len(myMatrix)):
+            myMatrix[i][j] -= temp
+
+    # Вычитаем минимальный элемент в столбцах
+    for i in range(len(myMatrix)):
+        temp = min(row[i] for row in myMatrix)
+        H_0 += temp
+        for j in range(len(myMatrix)):
+            myMatrix[j][i] -= temp
+
+    H_0 += Hk_1
+    return myMatrix, H_0
+
+
 n = int(input())
 matrix = []
+Hk = 0
 H = 0
 PathLenght = 0
 Str = []
@@ -28,6 +48,8 @@ Stb = []
 res = []
 result = []
 StartMatrix = []
+tree = {"parent": None, "value": 0, "left": None, "right": None}
+localRoot = tree
 
 # Инициализируем массивы для сохранения индексов
 for i in range(n):
@@ -43,26 +65,16 @@ for i in range(n): StartMatrix.append(matrix[i].copy())
 # Присваеваем главной диагонали float(inf)
 for i in range(n): matrix[i][i] = float('inf')
 
-while True:
-    # Редуцируем
-    # --------------------------------------
-    # Вычитаем минимальный элемент в строках
-    for i in range(len(matrix)):
-        temp = min(matrix[i])
-        H += temp
-        for j in range(len(matrix)):
-            matrix[i][j] -= temp
+# Редуцируем ориг матрицу
 
-    # Вычитаем минимальный элемент в столбцах
-    for i in range(len(matrix)):
-        temp = min(row[i] for row in matrix)
-        H += temp
-        for j in range(len(matrix)):
-            matrix[j][i] -= temp
-    # --------------------------------------
+# где менять Hk ???????
+matrix, H = reduceMatrix(matrix, H, Hk)
+tree["value"] = H
+
+
+while True:
 
     # Оцениваем нулевые клетки и ищем нулевую клетку с максимальной оценкой
-    # --------------------------------------
     NullMax = 0
     index1 = 0
     index2 = 0
@@ -75,9 +87,20 @@ while True:
                     NullMax = tmp
                     index1 = i
                     index2 = j
-    # --------------------------------------
 
-    # Находим нужный нам путь, записываем его в res и удаляем все ненужное
+    # первый потомок
+    localRoot["left"] = {"parent": localRoot, "value": H, "left": None, "right": None}
+
+    # второй потомок
+    localRoot["right"] = {"parent": localRoot, "value": H + NullMax, "left": None, "right": None}
+
+    if localRoot["left"]["value"] < localRoot["right"]["value"]:
+        localRoot = tree["left"]
+    else:
+        localRoot = tree["right"]
+
+    # res относится ко первому потомку, где мы добавляем отрезок пути
+    # не знаю как это связать
     res.append(Str[index1] + 1)
     res.append(Stb[index2] + 1)
 
@@ -90,7 +113,10 @@ while True:
     del Str[index1]
     del Stb[index2]
     matrix = Delete(matrix, index1, index2)
-    if len(matrix) == 1: break
+
+    # не ветвь
+    if len(matrix) == 1:
+        break
 
 # Формируем порядок пути
 for i in range(0, len(res) - 1, 2):
@@ -114,4 +140,13 @@ for i in range(0, len(result) - 1, 2):
         PathLenght += StartMatrix[result[i] - 1][result[i + 1] - 1]
 print(PathLenght)
 print("----------------------------------")
-input()
+
+
+'''
+5
+1 20 18 12 8
+5 1 14 7 11
+12 18 1 6 11
+11 17 11 1 12
+5 5 5 5 1
+'''
