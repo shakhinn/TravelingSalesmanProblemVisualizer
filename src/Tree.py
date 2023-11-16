@@ -11,7 +11,15 @@ class Tree:
         self.availableNodes = []
 
     def __del__(self):
-        self.__clearLinks()
+        self.__clearLinks(self.treeRoot)
+        self.treeRoot = None
+        self.currentRoot = None
 
-    def __clearLinks(self):
-        pass
+    def __clearLinks(self, node):
+        if node is None:
+            return
+        self.__clearLinks(node["left"])
+        node["left"] = None
+        self.__clearLinks(node["right"])
+        node["right"] = None
+        node["prev"] = None
