@@ -1,3 +1,6 @@
+from .Tree import Tree
+
+
 # Функция нахождения минимального элемента, исключая текущий элемент
 def Min(lst, myindex):
     return min(x for idx, x in enumerate(lst) if idx != myindex)
@@ -20,7 +23,8 @@ def PrintMatrix(matrix):
 
 
 # Редукция матрицы
-def reduceMatrix(myMatrix, H_0, Hk_1):
+def reduceMatrix(myMatrix, Hk_1):
+    H_0 = 0
     for i in range(len(myMatrix)):
         temp = min(myMatrix[i])
         H_0 += temp
@@ -38,18 +42,39 @@ def reduceMatrix(myMatrix, H_0, Hk_1):
     return myMatrix, H_0
 
 
+def findMaxZero(myMatrix):
+    maximum = 0
+    index1 = 0
+    index2 = 0
+    for i in range(len(myMatrix)):
+        for j in range(len(myMatrix)):
+            if myMatrix[i][j] == 0:
+                tmp = Min(myMatrix[i], j) + Min((row[j] for row in myMatrix), i)
+                if tmp >= maximum:
+                    maximum = tmp
+                    index1 = i
+                    index2 = j
+    return maximum, index1, index2
+
+
+def addWayToResult():
+    pass
+
+
+def skipWay():
+    pass
+
+
 n = int(input())
 matrix = []
-Hk = 0
-H = 0
-PathLenght = 0
+
+PathLength = 0
 Str = []
 Stb = []
 res = []
 result = []
 StartMatrix = []
-tree = {"parent": None, "value": 0, "left": None, "right": None}
-localRoot = tree
+tree = Tree()
 
 # Инициализируем массивы для сохранения индексов
 for i in range(n):
@@ -57,62 +82,41 @@ for i in range(n):
     Stb.append(i)
 
 # Вводим матрицу
-for i in range(n): matrix.append(list(map(int, input().split())))
+for i in range(n):
+    matrix.append(list(map(int, input().split())))
 
 # Сохраняем изначальную матрицу
-for i in range(n): StartMatrix.append(matrix[i].copy())
+for i in range(n):
+    StartMatrix.append(matrix[i].copy())
 
 # Присваеваем главной диагонали float(inf)
-for i in range(n): matrix[i][i] = float('inf')
+for i in range(n):
+    matrix[i][i] = float('inf')
 
 # Редуцируем ориг матрицу
 
-# где менять Hk ???????
-matrix, H = reduceMatrix(matrix, H, Hk)
-tree["value"] = H
-
+matrix, H = reduceMatrix(matrix, 0)
+tree.currentRoot["value"] = H
 
 while True:
 
     # Оцениваем нулевые клетки и ищем нулевую клетку с максимальной оценкой
-    NullMax = 0
-    index1 = 0
-    index2 = 0
-    tmp = 0
-    for i in range(len(matrix)):
-        for j in range(len(matrix)):
-            if matrix[i][j] == 0:
-                tmp = Min(matrix[i], j) + Min((row[j] for row in matrix), i)
-                if tmp >= NullMax:
-                    NullMax = tmp
-                    index1 = i
-                    index2 = j
-
-    # первый потомок
-    localRoot["left"] = {"parent": localRoot, "value": H, "left": None, "right": None}
-
-    # второй потомок
-    localRoot["right"] = {"parent": localRoot, "value": H + NullMax, "left": None, "right": None}
-
-    if localRoot["left"]["value"] < localRoot["right"]["value"]:
-        localRoot = tree["left"]
-    else:
-        localRoot = tree["right"]
+    NullMax, rowIndex, columnIndex = findMaxZero(matrix)
 
     # res относится ко первому потомку, где мы добавляем отрезок пути
     # не знаю как это связать
-    res.append(Str[index1] + 1)
-    res.append(Stb[index2] + 1)
+    res.append(Str[rowIndex] + 1)
+    res.append(Stb[columnIndex] + 1)
 
-    oldIndex1 = Str[index1]
-    oldIndex2 = Stb[index2]
+    oldIndex1 = Str[rowIndex]
+    oldIndex2 = Stb[columnIndex]
     if oldIndex2 in Str and oldIndex1 in Stb:
         NewIndex1 = Str.index(oldIndex2)
         NewIndex2 = Stb.index(oldIndex1)
         matrix[NewIndex1][NewIndex2] = float('inf')
-    del Str[index1]
-    del Stb[index2]
-    matrix = Delete(matrix, index1, index2)
+    del Str[rowIndex]
+    del Stb[columnIndex]
+    matrix = Delete(matrix, rowIndex, columnIndex)
 
     # не ветвь
     if len(matrix) == 1:
@@ -134,13 +138,12 @@ print(result)
 # Считаем длину пути
 for i in range(0, len(result) - 1, 2):
     if i == len(result) - 2:
-        PathLenght += StartMatrix[result[i] - 1][result[i + 1] - 1]
-        PathLenght += StartMatrix[result[i + 1] - 1][result[0] - 1]
+        PathLength += StartMatrix[result[i] - 1][result[i + 1] - 1]
+        PathLength += StartMatrix[result[i + 1] - 1][result[0] - 1]
     else:
-        PathLenght += StartMatrix[result[i] - 1][result[i + 1] - 1]
-print(PathLenght)
+        PathLength += StartMatrix[result[i] - 1][result[i + 1] - 1]
+print(PathLength)
 print("----------------------------------")
-
 
 '''
 5
