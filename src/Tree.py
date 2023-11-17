@@ -1,11 +1,11 @@
 class Tree:
-    def __init__(self):
+    def __init__(self, matrix):
         self.treeRoot = {
             "path": [],
             "value": -1,
-            "matrix": [],
-            "city_rows": [],
-            "city_cols": [],
+            "matrix": matrix,
+            "city_rows": [i for i in range(len(matrix))],
+            "city_cols": [i for i in range(len(matrix))],
             "prev": None,
             "left": None,
             "right": None,
