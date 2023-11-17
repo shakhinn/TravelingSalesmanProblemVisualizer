@@ -1,61 +1,21 @@
 import random
 import sys
-from operator import xor
-
-import matplotlib.pyplot as plt
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, \
-    QTableWidgetItem, QHeaderView, QMessageBox
+from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from qtpy import QtCore
-
-from src.TSPSolver import TSPSolver
+import matplotlib.pyplot as plt
 
 
 class MainWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("TSP solver")
-        matrix = [[1, 27, 43, 16, 30, 26], [7, 1, 16, 1, 30, 25], [20, 13, 1, 35, 5, 0],
-                  [21, 16, 25, 1, 18, 18], [12, 46, 27, 48, 1, 5], [23, 5, 5, 9, 5, 1]]
-        self.solver = TSPSolver(matrix)
-        self.table1 = QTableWidget()
-        self.table1.setMinimumSize(510, 500)
-        self.table1.setRowCount(6)
-        self.table1.setColumnCount(6)
-
-        self.table2 = QTableWidget()
-        self.table2.setMinimumSize(510, 500)
-        self.table2.setRowCount(6)
-        self.table2.setColumnCount(6)
-
-        self.table3 = QTableWidget()
-        self.table3.setMinimumSize(510, 500)
-        self.table3.setRowCount(6)
-        self.table3.setColumnCount(6)
-        self.buttonNext = QPushButton("Next step")
-        font = QFont("Roboto", 14)
-        self.buttonNext.setFont(font)
-        self.buttonNext.setStyleSheet("background-color: green")
-        self.buttonNext.clicked.connect(self.updateWindow)
-
-        header1 = self.table1.horizontalHeader()
-        header2 = self.table2.horizontalHeader()
-        header3 = self.table3.horizontalHeader()
-
-        for i in range(self.table1.columnCount()):
-            header1.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
-            header2.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
-            header3.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
-
-        self.matrixLayout = QVBoxLayout()
-        self.matrixLayout.addWidget(self.buttonNext)
-        self.matrixLayout.addWidget(self.table1)
-        self.matrixLayout.addWidget(self.table2)
-        self.matrixLayout.addWidget(self.table3)
+        self.table = QTableWidget()
+        self.table.setMinimumSize(1100, 500)
+        self.table.setRowCount(5)
+        self.table.setColumnCount(5)
         self.mainLayout = QHBoxLayout()
-        self.mainLayout.addLayout(self.matrixLayout)
+        self.mainLayout.addWidget(self.table)
 
         # -----------------------------------
         self.figure = plt.figure()
@@ -68,8 +28,11 @@ class MainWindow(QWidget):
         layout.addWidget(self.canvas)
         layout.addWidget(self.button)
         self.mainLayout.addLayout(layout)
+        # self.setLayout(layout)
         self.setLayout(self.mainLayout)
         # -----------------------------------
+
+        # self.table.show()
         self.show()
 
     def plot(self):

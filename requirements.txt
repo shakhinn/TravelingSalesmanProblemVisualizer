@@ -1,3 +1,2 @@
 PyQt5~=5.15.9
 matplotlib~=3.5.2
-QtPy~=2.4.1
