@@ -1,10 +1,15 @@
 class Tree:
-    def __init__(self):
+    def __init__(self, matrix):
         self.treeRoot = {
+            "path": [],
             "value": -1,
+            "matrix": matrix,
+            "city_rows": [i for i in range(len(matrix))],
+            "city_cols": [i for i in range(len(matrix))],
+            "cycles": {},
             "prev": None,
             "left": None,
-            "right": None
+            "right": None,
         }
         self.currentRoot = self.treeRoot
         # для поиска наименьших из возможных вершин.

@@ -1,117 +1,57 @@
-# Функция нахождения минимального элемента, исключая текущий элемент
-def Min(lst, myindex):
-    return min(x for idx, x in enumerate(lst) if idx != myindex)
-
-
-# функция удаления нужной строки и столбцах
-def Delete(matrix, index1, index2):
-    del matrix[index1]
-    for i in matrix:
-        del i[index2]
-    return matrix
-
-
-# Функция вывода матрицы
-def PrintMatrix(matrix):
-    print("---------------")
-    for i in range(len(matrix)):
-        print(matrix[i])
-    print("---------------")
-
+from src.TSPSolver import TSPSolver
 
 n = int(input())
 matrix = []
-H = 0
-PathLenght = 0
-Str = []
-Stb = []
-res = []
-result = []
 StartMatrix = []
 
-# Инициализируем массивы для сохранения индексов
-for i in range(n):
-    Str.append(i)
-    Stb.append(i)
-
 # Вводим матрицу
-for i in range(n): matrix.append(list(map(int, input().split())))
+for i in range(n):
+    matrix.append(list(map(int, input().split())))
 
 # Сохраняем изначальную матрицу
-for i in range(n): StartMatrix.append(matrix[i].copy())
+for i in range(n):
+    StartMatrix.append(matrix[i].copy())
 
-# Присваеваем главной диагонали float(inf)
-for i in range(n): matrix[i][i] = float('inf')
+solver = TSPSolver(matrix)
 
-while True:
-    # Редуцируем
-    # --------------------------------------
-    # Вычитаем минимальный элемент в строках
-    for i in range(len(matrix)):
-        temp = min(matrix[i])
-        H += temp
-        for j in range(len(matrix)):
-            matrix[i][j] -= temp
+for i in solver:
+    continue
 
-    # Вычитаем минимальный элемент в столбцах
-    for i in range(len(matrix)):
-        temp = min(row[i] for row in matrix)
-        H += temp
-        for j in range(len(matrix)):
-            matrix[j][i] -= temp
-    # --------------------------------------
+result = 0
+result += StartMatrix[solver.tree.currentRoot["city_rows"][0]][solver.tree.currentRoot["city_cols"][0]]
+print(solver.tree.currentRoot["city_rows"][0], solver.tree.currentRoot["city_cols"][0], sep=", ")
+while solver.tree.currentRoot is not None:
+    if len(solver.tree.currentRoot["path"]) > 0 and solver.tree.currentRoot["path"][0]:
+        result += StartMatrix[solver.tree.currentRoot["path"][1]][solver.tree.currentRoot["path"][2]]
+    print(solver.tree.currentRoot["path"])
+    solver.tree.currentRoot = solver.tree.currentRoot["prev"]
 
-    # Оцениваем нулевые клетки и ищем нулевую клетку с максимальной оценкой
-    # --------------------------------------
-    NullMax = 0
-    index1 = 0
-    index2 = 0
-    tmp = 0
-    for i in range(len(matrix)):
-        for j in range(len(matrix)):
-            if matrix[i][j] == 0:
-                tmp = Min(matrix[i], j) + Min((row[j] for row in matrix), i)
-                if tmp >= NullMax:
-                    NullMax = tmp
-                    index1 = i
-                    index2 = j
-    # --------------------------------------
-
-    # Находим нужный нам путь, записываем его в res и удаляем все ненужное
-    res.append(Str[index1] + 1)
-    res.append(Stb[index2] + 1)
-
-    oldIndex1 = Str[index1]
-    oldIndex2 = Stb[index2]
-    if oldIndex2 in Str and oldIndex1 in Stb:
-        NewIndex1 = Str.index(oldIndex2)
-        NewIndex2 = Stb.index(oldIndex1)
-        matrix[NewIndex1][NewIndex2] = float('inf')
-    del Str[index1]
-    del Stb[index2]
-    matrix = Delete(matrix, index1, index2)
-    if len(matrix) == 1: break
-
-# Формируем порядок пути
-for i in range(0, len(res) - 1, 2):
-    if res.count(res[i]) < 2:
-        result.append(res[i])
-        result.append(res[i + 1])
-for i in range(0, len(res) - 1, 2):
-    for j in range(0, len(res) - 1, 2):
-        if result[len(result) - 1] == res[j]:
-            result.append(res[j])
-            result.append(res[j + 1])
-print("----------------------------------")
 print(result)
+'''
+5
+1 20 18 12 8
+5 1 14 7 11
+12 18 1 6 11
+11 17 11 1 12
+5 5 5 5 1
+'''
 
-# Считаем длину пути
-for i in range(0, len(result) - 1, 2):
-    if i == len(result) - 2:
-        PathLenght += StartMatrix[result[i] - 1][result[i + 1] - 1]
-        PathLenght += StartMatrix[result[i + 1] - 1][result[0] - 1]
-    else:
-        PathLenght += StartMatrix[result[i] - 1][result[i + 1] - 1]
-print(PathLenght)
-print("----------------------------------")
-input()
+'''
+6
+1 27 43 16 30 26
+7 1 16 1 30 25
+20 13 1 35 5 0
+21 16 25 1 18 18
+12 46 27 48 1 5
+23 5 5 9 5 1
+'''
+
+'''
+6
+1 4	4 5	4 3	
+2 1	7 1	1 6
+2 3	1 9	4 5	
+1 3	2 1	3 1	
+7 4	1 1	1 4	
+2 3	4 7	9 1	
+'''
