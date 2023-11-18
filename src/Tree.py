@@ -6,6 +6,7 @@ class Tree:
             "matrix": matrix,
             "city_rows": [i for i in range(len(matrix))],
             "city_cols": [i for i in range(len(matrix))],
+            "cycles": {},
             "prev": None,
             "left": None,
             "right": None,

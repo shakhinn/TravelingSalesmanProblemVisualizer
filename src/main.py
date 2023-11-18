@@ -1,6 +1,3 @@
-from Tree import Tree
-from copy import deepcopy
-
 from src.TSPSolver import TSPSolver
 
 n = int(input())
@@ -16,15 +13,10 @@ for i in range(n):
     StartMatrix.append(matrix[i].copy())
 
 solver = TSPSolver(matrix)
-# Присваеваем главной диагонали float(inf)
-
 
 for i in solver:
     continue
 
-
-
-# print(tree.currentRoot["value"])
 result = 0
 result += StartMatrix[solver.tree.currentRoot["city_rows"][0]][solver.tree.currentRoot["city_cols"][0]]
 print(solver.tree.currentRoot["city_rows"][0], solver.tree.currentRoot["city_cols"][0], sep=", ")
