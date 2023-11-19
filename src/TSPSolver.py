@@ -1,5 +1,4 @@
 from copy import deepcopy
-
 from src.Tree import Tree
 
 
@@ -66,15 +65,18 @@ class TSPSolver:
         maximum = 0
         index1 = 0
         index2 = 0
+        zeros = []
         for i in range(len(myMatrix)):
             for j in range(len(myMatrix)):
                 if myMatrix[i][j] == 0:
                     tmp = self.__findMin(myMatrix[i], j) + self.__findMin((row[j] for row in myMatrix), i)
+                    zeros.append((tmp, i, j))
                     if tmp >= maximum:
                         maximum = tmp
                         index1 = i
                         index2 = j
-        self.callback(1, myMatrix)
+        self.callback(1, myMatrix, zeros)
+        print(f"maxZerO: {maximum}, position: {index1}, {index2}")
         return maximum, index1, index2
 
     def __addWayToResult(self, _matrix, row, column, city_rows, city_cols):
@@ -164,7 +166,7 @@ class TSPSolver:
         if flag:
             cycles.update([(node["path"][1], node["path"][2])])
 
-        ##find cycles
+        # find cycles
         for i in range(len(city_rows)):
             for j in range(len(city_cols)):
                 if cycles.get(city_cols[j]) is not None:

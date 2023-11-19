@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QP
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from qtpy import QtCore
-
 from src.TSPSolver import TSPSolver
 
 
@@ -83,7 +82,6 @@ class MainWindow(QWidget):
         try:
             next(self.solver)
             print(self.solver.tree.currentRoot["matrix"])
-            # self.showTable(1, self.solver.tree.currentRoot["matrix"])
         except StopIteration:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
@@ -92,7 +90,7 @@ class MainWindow(QWidget):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
 
-    def showTable(self, tableNumber: int, curMatrix: list):
+    def showTable(self, tableNumber: int, curMatrix: list, zeros=None):
         table = None
         header = None
         if tableNumber == 1:
@@ -106,7 +104,6 @@ class MainWindow(QWidget):
             header = self.header3
 
         print(f"table: {tableNumber}, matrix: {curMatrix}")
-        # table.clearContents()
         table.setRowCount(len(curMatrix))
         table.setColumnCount(len(curMatrix))
         for i in range(table.rowCount()):
@@ -119,6 +116,12 @@ class MainWindow(QWidget):
                 item = QTableWidgetItem(str(value))
                 item.setFlags(xor(item.flags(), QtCore.Qt.ItemIsEditable))
                 table.setItem(i, j, item)
+        if zeros is not None:
+            for i in range(len(zeros)):
+                value = "0(" + str(zeros[i][0]) + ")"
+                item = QTableWidgetItem(value)
+                item.setFlags(xor(item.flags(), QtCore.Qt.ItemIsEditable))
+                table.setItem(zeros[i][1], zeros[i][2], item)
 
 
 if __name__ == '__main__':
