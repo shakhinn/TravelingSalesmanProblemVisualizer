@@ -5,7 +5,7 @@ import math
 import matplotlib.pyplot as plt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, \
-    QTableWidgetItem, QHeaderView, QMessageBox
+    QTableWidgetItem, QHeaderView, QMessageBox, QLabel
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from qtpy import QtCore
@@ -20,19 +20,28 @@ class MainWindow(QWidget):
                   [21, 16, 25, 1, 18, 18], [12, 46, 27, 48, 1, 5], [23, 5, 5, 9, 5, 1]]
         self.solver = TSPSolver(matrix, callback=self.showTable)
         self.table1 = QTableWidget()
-        self.table1.setMinimumSize(510, 500)
+        self.table1.setMinimumSize(510, 470)
         self.table1.setRowCount(6)
         self.table1.setColumnCount(6)
 
         self.table2 = QTableWidget()
-        self.table2.setMinimumSize(510, 500)
+        self.table2.setMinimumSize(510, 470)
         self.table2.setRowCount(6)
         self.table2.setColumnCount(6)
 
         self.table3 = QTableWidget()
-        self.table3.setMinimumSize(510, 500)
+        self.table3.setMinimumSize(510, 470)
         self.table3.setRowCount(6)
         self.table3.setColumnCount(6)
+
+        fontLabels = QFont("Roboto", 12)
+        self.label1 = QLabel("Max Zeros")
+        self.label2 = QLabel("Left branch")
+        self.label3 = QLabel("Right branch (add to the result)")
+        self.label1.setFont(fontLabels)
+        self.label2.setFont(fontLabels)
+        self.label3.setFont(fontLabels)
+
         self.buttonNext = QPushButton("Next step")
         font = QFont("Roboto", 14)
         self.buttonNext.setFont(font)
@@ -50,8 +59,11 @@ class MainWindow(QWidget):
 
         self.matrixLayout = QVBoxLayout()
         self.matrixLayout.addWidget(self.buttonNext)
+        self.matrixLayout.addWidget(self.label1)
         self.matrixLayout.addWidget(self.table1)
+        self.matrixLayout.addWidget(self.label2)
         self.matrixLayout.addWidget(self.table2)
+        self.matrixLayout.addWidget(self.label3)
         self.matrixLayout.addWidget(self.table3)
         self.mainLayout = QHBoxLayout()
         self.mainLayout.addLayout(self.matrixLayout)
