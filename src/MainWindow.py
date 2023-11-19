@@ -6,10 +6,9 @@ import matplotlib.pyplot as plt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, \
     QTableWidgetItem, QHeaderView, QMessageBox, QLabel
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from qtpy import QtCore
 from src.TSPSolver import TSPSolver
+from treelib import Tree
 
 
 class MainWindow(QWidget):
@@ -18,7 +17,7 @@ class MainWindow(QWidget):
         self.setWindowTitle("TSP solver")
         matrix = [[1, 27, 43, 16, 30, 26], [7, 1, 16, 1, 30, 25], [20, 13, 1, 35, 5, 0],
                   [21, 16, 25, 1, 18, 18], [12, 46, 27, 48, 1, 5], [23, 5, 5, 9, 5, 1]]
-        self.solver = TSPSolver(matrix, callback=self.showTable)
+        self.solver = TSPSolver(matrix, matrixCallback=self.showTable, graphCallback=self.drawGraph)
         self.table1 = QTableWidget()
         self.table1.setMinimumSize(510, 470)
         self.table1.setRowCount(6)
@@ -43,8 +42,8 @@ class MainWindow(QWidget):
         self.label3.setFont(fontLabels)
 
         self.buttonNext = QPushButton("Next step")
-        font = QFont("Roboto", 14)
-        self.buttonNext.setFont(font)
+        self.font = QFont("Roboto", 14)
+        self.buttonNext.setFont(self.font)
         self.buttonNext.setStyleSheet("background-color: green")
         self.buttonNext.clicked.connect(self.updateWindow)
 
@@ -69,26 +68,35 @@ class MainWindow(QWidget):
         self.mainLayout.addLayout(self.matrixLayout)
 
         # -----------------------------------
-        self.figure = plt.figure()
-        self.canvas = FigureCanvas(self.figure)
-        self.toolbar = NavigationToolbar(self.canvas, self)
-        self.button = QPushButton('Plot')
-        self.button.clicked.connect(self.plot)
-        layout = QVBoxLayout()
-        layout.addWidget(self.toolbar)
-        layout.addWidget(self.canvas)
-        layout.addWidget(self.button)
-        self.mainLayout.addLayout(layout)
+        self.graphFont = QFont("Roboto", 18)
+        self.graph = QLabel(str(self.solver.tree.treeRoot["value"]))
+        self.graph.setFont(self.font)
+
+        self.layout = QHBoxLayout()
+        self.layout.addWidget(self.graph)
+        self.mainLayout.addLayout(self.layout)
         self.setLayout(self.mainLayout)
         # -----------------------------------
         self.show()
 
-    def plot(self):
-        data = [random.random() for i in range(10)]
-        self.figure.clear()
-        ax = self.figure.add_subplot(111)
-        ax.plot(data, '*-')
-        self.canvas.draw()
+    def drawGraph(self):
+        tree = Tree()
+        count = 0
+        tree.create_node(str(self.solver.tree.treeRoot["value"]), str(0))
+        while True:
+            if self.solver.tree.treeRoot["left"] is not None:
+                count += 1
+                tree.create_node(str(self.solver.tree.treeRoot["left"]["value"]), str(count), parent="root")
+            if self.solver.tree.treeRoot["right"] is not None:
+                count += 1
+                tree.create_node(str(self.solver.tree.treeRoot["right"]["value"]), str(count), parent="root")
+            else:
+                break
+
+        print(str(tree))
+        self.graph.setGeometry(300, 350, 300, 150)
+        self.graph.setWordWrap(True)
+        self.graph.setText(str(tree))
 
     def updateWindow(self):
         try:
