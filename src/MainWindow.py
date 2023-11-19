@@ -1,14 +1,16 @@
 import random
 import sys
 from operator import xor
-from src.TSPSolver import TSPSolver
+
+import matplotlib.pyplot as plt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QDialog, \
+from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, \
     QTableWidgetItem, QHeaderView, QMessageBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-import matplotlib.pyplot as plt
-from pyqt5_plugins.examples.exampleqmlitem import QtCore
+from qtpy import QtCore
+
+from src.TSPSolver import TSPSolver
 
 
 class MainWindow(QWidget):
