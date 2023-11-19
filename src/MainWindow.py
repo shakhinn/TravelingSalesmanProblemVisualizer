@@ -81,22 +81,23 @@ class MainWindow(QWidget):
 
     def drawGraph(self):
         tree = Tree()
-        count = 0
-        tree.create_node(str(self.solver.tree.treeRoot["value"]), str(0))
-        while True:
-            if self.solver.tree.treeRoot["left"] is not None:
-                count += 1
-                tree.create_node(str(self.solver.tree.treeRoot["left"]["value"]), str(count), parent="root")
-            if self.solver.tree.treeRoot["right"] is not None:
-                count += 1
-                tree.create_node(str(self.solver.tree.treeRoot["right"]["value"]), str(count), parent="root")
-            else:
-                break
+        tree.create_node(f"root, weight: {self.solver.tree.treeRoot['value']}", str(self.solver.tree.treeRoot["path"]))
+        self.addNodeToDrawingTree(tree, self.solver.tree.treeRoot['left'])
+        self.addNodeToDrawingTree(tree, self.solver.tree.treeRoot['right'])
+
 
         print(str(tree))
         self.graph.setGeometry(300, 350, 300, 150)
         self.graph.setWordWrap(True)
         self.graph.setText(str(tree))
+
+    def addNodeToDrawingTree(self, tree, node):
+        if node is None:
+            return
+        text = "add" if node["path"][0] else "skip"
+        tree.create_node(f"{text} route:[{node['path'][1]},{node['path'][2]}] weight: {node['value']}", str(node['path']), parent=str(node['prev']['path']))
+        self.addNodeToDrawingTree(tree, node['left'])
+        self.addNodeToDrawingTree(tree, node['right'])
 
     def updateWindow(self):
         try:

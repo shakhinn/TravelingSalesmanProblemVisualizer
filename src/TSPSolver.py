@@ -6,6 +6,7 @@ class TSPSolver:
     def __init__(self, matrix, matrixCallback, graphCallback):
         for i in range(len(matrix)):
             matrix[i][i] = float('inf')
+        self.__StartMatrix = deepcopy(matrix)
         self.tree = Tree(matrix)
         self.firstStep = True
         self.matrixCallback = matrixCallback
@@ -31,6 +32,16 @@ class TSPSolver:
                 self.__skipWay(self.tree.currentRoot["matrix"], NullMax, rowIndex, columnIndex)
                 self.tree.currentRoot = self.__findMinNode()
             else:
+                result = 0
+                result += self.__StartMatrix[self.tree.currentRoot["city_rows"][0]][self.tree.currentRoot["city_cols"][0]]
+                print(self.tree.currentRoot["city_rows"][0], self.tree.currentRoot["city_cols"][0], sep=", ")
+                while self.tree.currentRoot is not None:
+                    if len(self.tree.currentRoot["path"]) > 0 and self.tree.currentRoot["path"][0]:
+                        result += self.__StartMatrix[self.tree.currentRoot["path"][1]][self.tree.currentRoot["path"][2]]
+                    print(self.tree.currentRoot["path"])
+                    self.tree.currentRoot = self.tree.currentRoot["prev"]
+
+                print(result)
                 raise StopIteration
 
     def __findMin(self, lst, myindex):
@@ -114,8 +125,10 @@ class TSPSolver:
         new_matrix = deepcopy(matrix_)
         new_matrix[row][col] = float("inf")
         new_matrix, _ = self.__reduceMatrix(new_matrix, 0)
+        tmpRows = self.tree.currentRoot["city_rows"][row]
+        tmpColumns = self.tree.currentRoot["city_cols"][col]
         self.tree.currentRoot["left"] = {
-            "path": [0, row, col],
+            "path": [0, tmpRows, tmpColumns],
             "value": self.tree.currentRoot["value"] + maxZero,
             "matrix": new_matrix,
             "cycles": deepcopy(self.tree.currentRoot["cycles"]),
