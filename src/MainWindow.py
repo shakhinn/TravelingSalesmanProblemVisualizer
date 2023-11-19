@@ -1,7 +1,7 @@
 import random
 import sys
 from operator import xor
-
+import math
 import matplotlib.pyplot as plt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, \
@@ -19,7 +19,7 @@ class MainWindow(QWidget):
         self.setWindowTitle("TSP solver")
         matrix = [[1, 27, 43, 16, 30, 26], [7, 1, 16, 1, 30, 25], [20, 13, 1, 35, 5, 0],
                   [21, 16, 25, 1, 18, 18], [12, 46, 27, 48, 1, 5], [23, 5, 5, 9, 5, 1]]
-        self.solver = TSPSolver(matrix)
+        self.solver = TSPSolver(matrix, callback=self.showTable)
         self.table1 = QTableWidget()
         self.table1.setMinimumSize(510, 500)
         self.table1.setRowCount(6)
@@ -40,14 +40,14 @@ class MainWindow(QWidget):
         self.buttonNext.setStyleSheet("background-color: green")
         self.buttonNext.clicked.connect(self.updateWindow)
 
-        header1 = self.table1.horizontalHeader()
-        header2 = self.table2.horizontalHeader()
-        header3 = self.table3.horizontalHeader()
+        self.header1 = self.table1.horizontalHeader()
+        self.header2 = self.table2.horizontalHeader()
+        self.header3 = self.table3.horizontalHeader()
 
         for i in range(self.table1.columnCount()):
-            header1.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
-            header2.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
-            header3.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
+            self.header1.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
+            self.header2.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
+            self.header3.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
 
         self.matrixLayout = QVBoxLayout()
         self.matrixLayout.addWidget(self.buttonNext)
@@ -83,7 +83,7 @@ class MainWindow(QWidget):
         try:
             next(self.solver)
             print(self.solver.tree.currentRoot["matrix"])
-            self.showTable()
+            # self.showTable(1, self.solver.tree.currentRoot["matrix"])
         except StopIteration:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
@@ -92,28 +92,33 @@ class MainWindow(QWidget):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
 
-    def showTable(self):
-        self.table1.clearContents()
-        records = self.solver.tree.currentRoot["matrix"]
-        for i in range(len(records)):
-            self.table1.setRowCount(len(records))
-            self.table1.setColumnCount(len(records))
-            for j in range(len(records[i])):
-                item1 = QTableWidgetItem(str(records[i][j]))
-                item1.setFlags(xor(item1.flags(), QtCore.Qt.ItemIsEditable))
-                item2 = QTableWidgetItem(str(records[i][j]))
-                item2.setFlags(xor(item1.flags(), QtCore.Qt.ItemIsEditable))
-                item3 = QTableWidgetItem(str(records[i][j]))
-                item3.setFlags(xor(item3.flags(), QtCore.Qt.ItemIsEditable))
-                item4 = QTableWidgetItem(str(records[i][j]))
-                item4.setFlags(xor(item4.flags(), QtCore.Qt.ItemIsEditable))
-                item5 = QTableWidgetItem(str(records[i][j]))
-                item5.setFlags(xor(item5.flags(), QtCore.Qt.ItemIsEditable))
-                self.table1.setItem(i, j, item1)
-                self.table1.setItem(i, j, item2)
-                self.table1.setItem(i, j, item3)
-                self.table1.setItem(i, j, item4)
-                self.table1.setItem(i, j, item5)
+    def showTable(self, tableNumber: int, curMatrix: list):
+        table = None
+        header = None
+        if tableNumber == 1:
+            table = self.table1
+            header = self.header1
+        elif tableNumber == 2:
+            table = self.table2
+            header = self.header2
+        elif tableNumber == 3:
+            table = self.table3
+            header = self.header3
+
+        print(f"table: {tableNumber}, matrix: {curMatrix}")
+        # table.clearContents()
+        table.setRowCount(len(curMatrix))
+        table.setColumnCount(len(curMatrix))
+        for i in range(table.rowCount()):
+            header.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
+        for i in range(len(curMatrix)):
+            for j in range(len(curMatrix[i])):
+                value = curMatrix[i][j]
+                if math.isnan(curMatrix[i][j]):
+                    value = float("inf")
+                item = QTableWidgetItem(str(value))
+                item.setFlags(xor(item.flags(), QtCore.Qt.ItemIsEditable))
+                table.setItem(i, j, item)
 
 
 if __name__ == '__main__':

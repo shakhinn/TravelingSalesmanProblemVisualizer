@@ -4,11 +4,12 @@ from src.Tree import Tree
 
 
 class TSPSolver:
-    def __init__(self, matrix):
+    def __init__(self, matrix, callback):
         for i in range(len(matrix)):
             matrix[i][i] = float('inf')
         self.tree = Tree(matrix)
         self.firstStep = True
+        self.callback = callback
 
     def __iter__(self):
         return self
@@ -19,6 +20,7 @@ class TSPSolver:
             self.tree.currentRoot["value"] = H
             self.tree.currentRoot["matrix"] = matrix
             self.firstStep = False
+            self.callback(1, self.tree.currentRoot["matrix"])
         else:
             if len(self.tree.currentRoot["matrix"]) > 1:
                 # Оцениваем нулевые клетки и ищем нулевую клетку с максимальной оценкой
@@ -72,6 +74,7 @@ class TSPSolver:
                         maximum = tmp
                         index1 = i
                         index2 = j
+        self.callback(1, myMatrix)
         return maximum, index1, index2
 
     def __addWayToResult(self, _matrix, row, column, city_rows, city_cols):
@@ -102,8 +105,8 @@ class TSPSolver:
         }
 
         self.__findAndRemoveCycles(self.tree.currentRoot["right"])
-
         self.tree.availableNodes.append(self.tree.currentRoot["right"])
+        self.callback(2, matrix_)
 
     def __skipWay(self, matrix_, maxZero, row, col):
         new_matrix = deepcopy(matrix_)
@@ -120,10 +123,9 @@ class TSPSolver:
             "left": None,
             "right": None,
         }
-
         self.__findAndRemoveCycles(self.tree.currentRoot["left"])
-
         self.tree.availableNodes.append(self.tree.currentRoot["left"])
+        self.callback(3, new_matrix)
 
     def __findMinNode(self):
         minNode = self.tree.availableNodes[0]
