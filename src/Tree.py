@@ -9,7 +9,7 @@ class Tree:
             "cycles": {},
             "prev": None,
             "left": None,
-            "right": None,
+            "right": None
         }
         self.currentRoot = self.treeRoot
         # для поиска наименьших из возможных вершин.
