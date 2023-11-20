@@ -1,14 +1,16 @@
 from copy import deepcopy
-
 from src.Tree import Tree
 
 
 class TSPSolver:
-    def __init__(self, matrix):
+    def __init__(self, matrix, matrixCallback, graphCallback):
         for i in range(len(matrix)):
             matrix[i][i] = float('inf')
+        self.__StartMatrix = deepcopy(matrix)
         self.tree = Tree(matrix)
         self.firstStep = True
+        self.matrixCallback = matrixCallback
+        self.graphCallback = graphCallback
 
     def __iter__(self):
         return self
@@ -19,6 +21,7 @@ class TSPSolver:
             self.tree.currentRoot["value"] = H
             self.tree.currentRoot["matrix"] = matrix
             self.firstStep = False
+            self.matrixCallback(1, self.tree.currentRoot["matrix"])
         else:
             if len(self.tree.currentRoot["matrix"]) > 1:
                 # Оцениваем нулевые клетки и ищем нулевую клетку с максимальной оценкой
@@ -29,6 +32,19 @@ class TSPSolver:
                 self.__skipWay(self.tree.currentRoot["matrix"], NullMax, rowIndex, columnIndex)
                 self.tree.currentRoot = self.__findMinNode()
             else:
+                self.result = 0
+                self.resultPath = ""
+                self.result += self.__StartMatrix[self.tree.currentRoot["city_rows"][0]][self.tree.currentRoot["city_cols"][0]]
+                print(self.tree.currentRoot["city_rows"][0], self.tree.currentRoot["city_cols"][0], sep=", ")
+                self.resultPath += f"({self.tree.currentRoot['city_rows'][0]} -> {self.tree.currentRoot['city_cols'][0]}), "
+                while self.tree.currentRoot is not None:
+                    if len(self.tree.currentRoot["path"]) > 0 and self.tree.currentRoot["path"][0]:
+                        self.result += self.__StartMatrix[self.tree.currentRoot["path"][1]][self.tree.currentRoot["path"][2]]
+                        self.resultPath += f"({self.tree.currentRoot['path'][1]} -> {self.tree.currentRoot['path'][2]}), "
+
+                    self.tree.currentRoot = self.tree.currentRoot["prev"]
+
+                print(self.result)
                 raise StopIteration
 
     def __findMin(self, lst, myindex):
@@ -64,14 +80,17 @@ class TSPSolver:
         maximum = 0
         index1 = 0
         index2 = 0
+        zeros = []
         for i in range(len(myMatrix)):
             for j in range(len(myMatrix)):
                 if myMatrix[i][j] == 0:
                     tmp = self.__findMin(myMatrix[i], j) + self.__findMin((row[j] for row in myMatrix), i)
+                    zeros.append((tmp, i, j))
                     if tmp >= maximum:
                         maximum = tmp
                         index1 = i
                         index2 = j
+        self.matrixCallback(1, myMatrix, zeros)
         return maximum, index1, index2
 
     def __addWayToResult(self, _matrix, row, column, city_rows, city_cols):
@@ -102,15 +121,17 @@ class TSPSolver:
         }
 
         self.__findAndRemoveCycles(self.tree.currentRoot["right"])
-
         self.tree.availableNodes.append(self.tree.currentRoot["right"])
+        self.matrixCallback(2, matrix_)
 
     def __skipWay(self, matrix_, maxZero, row, col):
         new_matrix = deepcopy(matrix_)
         new_matrix[row][col] = float("inf")
         new_matrix, _ = self.__reduceMatrix(new_matrix, 0)
+        tmpRows = self.tree.currentRoot["city_rows"][row]
+        tmpColumns = self.tree.currentRoot["city_cols"][col]
         self.tree.currentRoot["left"] = {
-            "path": [0, row, col],
+            "path": [0, tmpRows, tmpColumns],
             "value": self.tree.currentRoot["value"] + maxZero,
             "matrix": new_matrix,
             "cycles": deepcopy(self.tree.currentRoot["cycles"]),
@@ -120,10 +141,9 @@ class TSPSolver:
             "left": None,
             "right": None,
         }
-
         self.__findAndRemoveCycles(self.tree.currentRoot["left"])
-
         self.tree.availableNodes.append(self.tree.currentRoot["left"])
+        self.matrixCallback(3, new_matrix)
 
     def __findMinNode(self):
         minNode = self.tree.availableNodes[0]
@@ -131,6 +151,7 @@ class TSPSolver:
             if self.tree.availableNodes[i]["value"] < minNode["value"]:
                 minNode = self.tree.availableNodes[i]
         self.tree.availableNodes.remove(minNode)
+        self.graphCallback()
         return minNode
 
     def __findAndRemoveCycles(self, node: dict):
@@ -162,7 +183,7 @@ class TSPSolver:
         if flag:
             cycles.update([(node["path"][1], node["path"][2])])
 
-        ##find cycles
+        # find cycles
         for i in range(len(city_rows)):
             for j in range(len(city_cols)):
                 if cycles.get(city_cols[j]) is not None:
