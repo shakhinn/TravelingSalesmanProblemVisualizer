@@ -1,0 +1,19 @@
+name: Travaling Salesman Problem Visualizer Builder
+on:
+  push:
+
+jobs:
+  build-app:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - run: pip install -r requirements.txt pyinstaller
+      - run: pyinstaller  --onefile --icon=img/87105.ico --noconsole src/MainWindow.py
+      - uses: actions/upload-artifact@v2
+        with:
+          name: tsp-solver
+          path: dist/*
+          retention-days: 2
