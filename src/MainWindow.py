@@ -125,7 +125,7 @@ class MainWindow(QWidget):
         except StopIteration:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
-            msg.setText(f"The algorithm came to the end, result = {self.solver.result}")
+            msg.setText(f"The algorithm came to the end, result = {self.solver.result}\n{self.solver.resultPath}")
             msg.setWindowTitle("Competed")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
