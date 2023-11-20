@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, \
 from treelib import Tree
 
 from src.TSPSolver import TSPSolver
-from InputWindow import InputWindow
+from src.InputWindow import InputWindow
 
 
 class MainWindow(QWidget):
