@@ -32,16 +32,16 @@ class TSPSolver:
                 self.__skipWay(self.tree.currentRoot["matrix"], NullMax, rowIndex, columnIndex)
                 self.tree.currentRoot = self.__findMinNode()
             else:
-                result = 0
-                result += self.__StartMatrix[self.tree.currentRoot["city_rows"][0]][self.tree.currentRoot["city_cols"][0]]
+                self.result = 0
+                self.result += self.__StartMatrix[self.tree.currentRoot["city_rows"][0]][self.tree.currentRoot["city_cols"][0]]
                 print(self.tree.currentRoot["city_rows"][0], self.tree.currentRoot["city_cols"][0], sep=", ")
                 while self.tree.currentRoot is not None:
                     if len(self.tree.currentRoot["path"]) > 0 and self.tree.currentRoot["path"][0]:
-                        result += self.__StartMatrix[self.tree.currentRoot["path"][1]][self.tree.currentRoot["path"][2]]
+                        self.result += self.__StartMatrix[self.tree.currentRoot["path"][1]][self.tree.currentRoot["path"][2]]
                     print(self.tree.currentRoot["path"])
                     self.tree.currentRoot = self.tree.currentRoot["prev"]
 
-                print(result)
+                print(self.result)
                 raise StopIteration
 
     def __findMin(self, lst, myindex):

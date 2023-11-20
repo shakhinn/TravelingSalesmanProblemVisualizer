@@ -1,23 +1,27 @@
-import random
+import math
 import sys
 from operator import xor
-import math
-import matplotlib.pyplot as plt
+
+from PyQt5 import QtCore
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, \
-    QTableWidgetItem, QHeaderView, QMessageBox, QLabel
-from qtpy import QtCore
-from src.TSPSolver import TSPSolver
+from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, \
+    QPushButton, QVBoxLayout, QTableWidgetItem, QHeaderView, QMessageBox, QLabel
 from treelib import Tree
+
+from src.TSPSolver import TSPSolver
+from InputWindow import InputWindow
 
 
 class MainWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("TSP solver")
-        matrix = [[1, 27, 43, 16, 30, 26], [7, 1, 16, 1, 30, 25], [20, 13, 1, 35, 5, 0],
-                  [21, 16, 25, 1, 18, 18], [12, 46, 27, 48, 1, 5], [23, 5, 5, 9, 5, 1]]
-        self.solver = TSPSolver(matrix, matrixCallback=self.showTable, graphCallback=self.drawGraph)
+        self.setGeometry(800, 800, 800, 800)
+        self.solver = None
+        self.flag = True
+        self.inputWindow = InputWindow()
+
         self.table1 = QTableWidget()
         self.table1.setMinimumSize(510, 470)
         self.table1.setRowCount(6)
@@ -56,24 +60,33 @@ class MainWindow(QWidget):
             self.header2.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
             self.header3.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
 
+        self.graphFont = QFont("Roboto", 18)
+        self.graph = QLabel("0")
+        self.graph.setFont(self.font)
+        self.graphLabel = QLabel("Tree")
+        self.graphLabel.setFont(self.font)
+        self.graphLabel.setStyleSheet("background-color: yellow")
+        self.graphLabel.setAlignment(Qt.AlignCenter)
+
         self.matrixLayout = QVBoxLayout()
+        self.graphLayout = QVBoxLayout()
         self.matrixLayout.addWidget(self.buttonNext)
         self.matrixLayout.addWidget(self.label1)
         self.matrixLayout.addWidget(self.table1)
-        self.matrixLayout.addWidget(self.label2)
-        self.matrixLayout.addWidget(self.table2)
-        self.matrixLayout.addWidget(self.label3)
-        self.matrixLayout.addWidget(self.table3)
+        self.graphLayout.addWidget(self.graphLabel)
+        self.graphLayout.addWidget(self.graph)
+        self.matrixLayout.addLayout(self.graphLayout)
+
         self.mainLayout = QHBoxLayout()
         self.mainLayout.addLayout(self.matrixLayout)
 
         # -----------------------------------
-        self.graphFont = QFont("Roboto", 18)
-        self.graph = QLabel(str(self.solver.tree.treeRoot["value"]))
-        self.graph.setFont(self.font)
 
-        self.layout = QHBoxLayout()
-        self.layout.addWidget(self.graph)
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.label2)
+        self.layout.addWidget(self.table2)
+        self.layout.addWidget(self.label3)
+        self.layout.addWidget(self.table3)
         self.mainLayout.addLayout(self.layout)
         self.setLayout(self.mainLayout)
         # -----------------------------------
@@ -84,8 +97,6 @@ class MainWindow(QWidget):
         tree.create_node(f"root, weight: {self.solver.tree.treeRoot['value']}", str(self.solver.tree.treeRoot["path"]))
         self.addNodeToDrawingTree(tree, self.solver.tree.treeRoot['left'])
         self.addNodeToDrawingTree(tree, self.solver.tree.treeRoot['right'])
-
-
         print(str(tree))
         self.graph.setGeometry(300, 350, 300, 150)
         self.graph.setWordWrap(True)
@@ -100,13 +111,19 @@ class MainWindow(QWidget):
         self.addNodeToDrawingTree(tree, node['right'])
 
     def updateWindow(self):
+        if self.inputWindow.inputMatrix is None:
+            # matrix = [[1, 27, 43, 16, 30, 26], [7, 1, 16, 1, 30, 25], [20, 13, 1, 35, 5, 0],
+            #           [21, 16, 25, 1, 18, 18], [12, 46, 27, 48, 1, 5], [23, 5, 5, 9, 5, 1]]
+            self.inputWindow.invoke()
+            return
+        if self.solver is None:
+            self.solver = TSPSolver(self.inputWindow.inputMatrix, matrixCallback=self.showTable, graphCallback=self.drawGraph)
         try:
             next(self.solver)
-            print(self.solver.tree.currentRoot["matrix"])
         except StopIteration:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
-            msg.setText("The algorithm came to the end")
+            msg.setText(f"The algorithm came to the end, result = {self.solver.result}")
             msg.setWindowTitle("Competed")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
