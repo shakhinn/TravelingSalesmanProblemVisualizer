@@ -1,5 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QTableWidget, QHBoxLayout, QVBoxLayout, QHeaderView, QPushButton, \
-    QComboBox
+from PyQt5.QtWidgets import QWidget, QTableWidget, QVBoxLayout, QHeaderView, QPushButton, QComboBox
 
 
 class InputWindow(QWidget):
@@ -32,7 +31,6 @@ class InputWindow(QWidget):
     def setSize(self):
         if self.inputSize.currentTextChanged:
             size = int(self.inputSize.currentText())
-            print("size: ", size)
             if size > 0:
                 self.inputTable.setRowCount(size)
                 self.inputTable.setColumnCount(size)

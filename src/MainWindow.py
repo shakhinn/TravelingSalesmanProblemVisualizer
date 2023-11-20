@@ -39,17 +39,21 @@ class MainWindow(QWidget):
 
         fontLabels = QFont("Roboto", 12)
         self.label1 = QLabel("Max Zeros")
-        self.label2 = QLabel("Left branch")
-        self.label3 = QLabel("Right branch (add to the result)")
+        self.label2 = QLabel("Right branch (add to the result)")
+        self.label3 = QLabel("Left branch")
         self.label1.setFont(fontLabels)
         self.label2.setFont(fontLabels)
         self.label3.setFont(fontLabels)
 
         self.buttonNext = QPushButton("Next step")
+        self.buttonMatrix = QPushButton("Insert matrix")
         self.font = QFont("Roboto", 14)
         self.buttonNext.setFont(self.font)
+        self.buttonMatrix.setFont(self.font)
         self.buttonNext.setStyleSheet("background-color: green")
+        self.buttonMatrix.setStyleSheet("background-color: cyan")
         self.buttonNext.clicked.connect(self.updateWindow)
+        self.buttonMatrix.clicked.connect(self.inputWindow.invoke)
 
         self.header1 = self.table1.horizontalHeader()
         self.header2 = self.table2.horizontalHeader()
@@ -83,6 +87,7 @@ class MainWindow(QWidget):
         # -----------------------------------
 
         self.layout = QVBoxLayout()
+        self.layout.addWidget(self.buttonMatrix)
         self.layout.addWidget(self.label2)
         self.layout.addWidget(self.table2)
         self.layout.addWidget(self.label3)
@@ -97,7 +102,6 @@ class MainWindow(QWidget):
         tree.create_node(f"root, weight: {self.solver.tree.treeRoot['value']}", str(self.solver.tree.treeRoot["path"]))
         self.addNodeToDrawingTree(tree, self.solver.tree.treeRoot['left'])
         self.addNodeToDrawingTree(tree, self.solver.tree.treeRoot['right'])
-        print(str(tree))
         self.graph.setGeometry(300, 350, 300, 150)
         self.graph.setWordWrap(True)
         self.graph.setText(str(tree))
@@ -112,8 +116,6 @@ class MainWindow(QWidget):
 
     def updateWindow(self):
         if self.inputWindow.inputMatrix is None:
-            # matrix = [[1, 27, 43, 16, 30, 26], [7, 1, 16, 1, 30, 25], [20, 13, 1, 35, 5, 0],
-            #           [21, 16, 25, 1, 18, 18], [12, 46, 27, 48, 1, 5], [23, 5, 5, 9, 5, 1]]
             self.inputWindow.invoke()
             return
         if self.solver is None:
@@ -141,9 +143,9 @@ class MainWindow(QWidget):
             table = self.table3
             header = self.header3
 
-        print(f"table: {tableNumber}, matrix: {curMatrix}")
         table.setRowCount(len(curMatrix))
         table.setColumnCount(len(curMatrix))
+
         for i in range(table.rowCount()):
             header.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
         for i in range(len(curMatrix)):
