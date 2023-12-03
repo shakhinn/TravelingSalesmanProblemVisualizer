@@ -21,7 +21,8 @@ class TSPSolver:
             self.tree.currentRoot["value"] = H
             self.tree.currentRoot["matrix"] = matrix
             self.firstStep = False
-            self.matrixCallback(1, self.tree.currentRoot["matrix"])
+            self.matrixCallback(1, self.tree.currentRoot["matrix"], self.tree.currentRoot["city_cols"],
+                                self.tree.currentRoot["city_rows"])
         else:
             if len(self.tree.currentRoot["matrix"]) > 1:
                 # Оцениваем нулевые клетки и ищем нулевую клетку с максимальной оценкой
@@ -34,13 +35,15 @@ class TSPSolver:
             else:
                 self.result = 0
                 self.resultPath = ""
-                self.result += self.__StartMatrix[self.tree.currentRoot["city_rows"][0]][self.tree.currentRoot["city_cols"][0]]
-                print(self.tree.currentRoot["city_rows"][0], self.tree.currentRoot["city_cols"][0], sep=", ")
-                self.resultPath += f"({self.tree.currentRoot['city_rows'][0]} -> {self.tree.currentRoot['city_cols'][0]}), "
+                self.result += self.__StartMatrix[self.tree.currentRoot["city_rows"][0]][
+                    self.tree.currentRoot["city_cols"][0]]
+                print(self.tree.currentRoot["city_rows"][0] + 1, self.tree.currentRoot["city_cols"][0] + 1, sep=", ")
+                self.resultPath += f"({self.tree.currentRoot['city_rows'][0] + 1} -> {self.tree.currentRoot['city_cols'][0] + 1}), "
                 while self.tree.currentRoot is not None:
                     if len(self.tree.currentRoot["path"]) > 0 and self.tree.currentRoot["path"][0]:
-                        self.result += self.__StartMatrix[self.tree.currentRoot["path"][1]][self.tree.currentRoot["path"][2]]
-                        self.resultPath += f"({self.tree.currentRoot['path'][1]} -> {self.tree.currentRoot['path'][2]}), "
+                        self.result += self.__StartMatrix[self.tree.currentRoot["path"][1]][
+                            self.tree.currentRoot["path"][2]]
+                        self.resultPath += f"({self.tree.currentRoot['path'][1] + 1} -> {self.tree.currentRoot['path'][2] + 1}), "
 
                     self.tree.currentRoot = self.tree.currentRoot["prev"]
 
@@ -90,7 +93,8 @@ class TSPSolver:
                         maximum = tmp
                         index1 = i
                         index2 = j
-        self.matrixCallback(1, myMatrix, zeros)
+        self.matrixCallback(1, myMatrix, self.tree.currentRoot["city_cols"],
+                            self.tree.currentRoot["city_rows"], zeros)
         return maximum, index1, index2
 
     def __addWayToResult(self, _matrix, row, column, city_rows, city_cols):
@@ -122,7 +126,7 @@ class TSPSolver:
 
         self.__findAndRemoveCycles(self.tree.currentRoot["right"])
         self.tree.availableNodes.append(self.tree.currentRoot["right"])
-        self.matrixCallback(2, matrix_)
+        self.matrixCallback(2, matrix_, city_cols, city_rows)
 
     def __skipWay(self, matrix_, maxZero, row, col):
         new_matrix = deepcopy(matrix_)
@@ -143,7 +147,7 @@ class TSPSolver:
         }
         self.__findAndRemoveCycles(self.tree.currentRoot["left"])
         self.tree.availableNodes.append(self.tree.currentRoot["left"])
-        self.matrixCallback(3, new_matrix)
+        self.matrixCallback(3, new_matrix,  self.tree.currentRoot["city_cols"], self.tree.currentRoot["city_rows"])
 
     def __findMinNode(self):
         minNode = self.tree.availableNodes[0]
@@ -189,4 +193,3 @@ class TSPSolver:
                 if cycles.get(city_cols[j]) is not None:
                     if cycles.get(city_cols[j]) == city_rows[i]:
                         matrix_[i][j] = float('inf')
-
