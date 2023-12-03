@@ -35,19 +35,26 @@ class TSPSolver:
                 self.tree.currentRoot = self.__findMinNode()
             else:
                 self.result = 0
+                self.allPaths = {}
                 self.resultPath = ""
                 self.result += self.__StartMatrix[self.tree.currentRoot["city_rows"][0]][
                     self.tree.currentRoot["city_cols"][0]]
                 print(self.tree.currentRoot["city_rows"][0] + 1, self.tree.currentRoot["city_cols"][0] + 1, sep=", ")
-                self.resultPath += f"({self.tree.currentRoot['city_rows'][0] + 1} -> {self.tree.currentRoot['city_cols'][0] + 1}), "
+                self.allPaths.update(
+                    {self.tree.currentRoot['city_rows'][0] + 1: self.tree.currentRoot['city_cols'][0] + 1})
                 while self.tree.currentRoot is not None:
                     if len(self.tree.currentRoot["path"]) > 0 and self.tree.currentRoot["path"][0]:
                         self.result += self.__StartMatrix[self.tree.currentRoot["path"][1]][
                             self.tree.currentRoot["path"][2]]
-                        self.resultPath += f"({self.tree.currentRoot['path'][1] + 1} -> {self.tree.currentRoot['path'][2] + 1}), "
-
+                        self.allPaths.update(
+                            {self.tree.currentRoot['path'][1] + 1: self.tree.currentRoot['path'][2] + 1})
                     self.tree.currentRoot = self.tree.currentRoot["prev"]
-
+                key = 1
+                for i in range(len(self.allPaths)):
+                    tmp = self.allPaths.get(key)
+                    self.resultPath += f"({key} -> {tmp}), "
+                    key = tmp
+                self.resultPath = self.resultPath[0:-2]
                 print(self.result)
                 raise StopIteration
 
