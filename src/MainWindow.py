@@ -5,7 +5,7 @@ from operator import xor
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont, QStandardItemModel
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QTableWidget, QApplication, QWidget, QHBoxLayout, \
     QPushButton, QVBoxLayout, QTableWidgetItem, QHeaderView, QMessageBox, QLabel
 from treelib import Tree
@@ -111,7 +111,8 @@ class MainWindow(QWidget):
         if node is None:
             return
         text = "add" if node["path"][0] else "skip"
-        tree.create_node(f"{text} route:[{node['path'][1]+1},{node['path'][2]+1}] weight: {node['value']}", str(node['path']), parent=str(node['prev']['path']))
+        tree.create_node(f"{text} route:[{node['path'][1] + 1},{node['path'][2] + 1}] weight: {node['value']}",
+                         str(node['path']), parent=str(node['prev']['path']))
         self.addNodeToDrawingTree(tree, node['left'])
         self.addNodeToDrawingTree(tree, node['right'])
 
@@ -120,7 +121,8 @@ class MainWindow(QWidget):
             self.inputWindow.invoke()
             return
         if self.solver is None:
-            self.solver = TSPSolver(self.inputWindow.inputMatrix, matrixCallback=self.showTable, graphCallback=self.drawGraph)
+            self.solver = TSPSolver(self.inputWindow.inputMatrix, matrixCallback=self.showTable,
+                                    graphCallback=self.drawGraph)
         try:
             next(self.solver)
         except StopIteration:
@@ -135,10 +137,10 @@ class MainWindow(QWidget):
         horizontalLabels_str = deepcopy(horizontalLabels)
         verticalLabels_str = deepcopy(verticalLabels)
         for i in range(len(horizontalLabels_str)):
-            horizontalLabels_str[i] = str(horizontalLabels_str[i]+1)
+            horizontalLabels_str[i] = str(horizontalLabels_str[i] + 1)
 
         for i in range(len(verticalLabels_str)):
-            verticalLabels_str[i] = str(verticalLabels_str[i]+1)
+            verticalLabels_str[i] = str(verticalLabels_str[i] + 1)
 
         table = None
         header = None

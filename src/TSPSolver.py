@@ -21,8 +21,9 @@ class TSPSolver:
             self.tree.currentRoot["value"] = H
             self.tree.currentRoot["matrix"] = matrix
             self.firstStep = False
-            self.matrixCallback(1, self.tree.currentRoot["matrix"], self.tree.currentRoot["city_cols"],
-                                self.tree.currentRoot["city_rows"])
+            if self.matrixCallback:
+                self.matrixCallback(1, self.tree.currentRoot["matrix"], self.tree.currentRoot["city_cols"],
+                                    self.tree.currentRoot["city_rows"])
         else:
             if len(self.tree.currentRoot["matrix"]) > 1:
                 # Оцениваем нулевые клетки и ищем нулевую клетку с максимальной оценкой
@@ -93,8 +94,9 @@ class TSPSolver:
                         maximum = tmp
                         index1 = i
                         index2 = j
-        self.matrixCallback(1, myMatrix, self.tree.currentRoot["city_cols"],
-                            self.tree.currentRoot["city_rows"], zeros)
+        if self.matrixCallback:
+            self.matrixCallback(1, myMatrix, self.tree.currentRoot["city_cols"],
+                                self.tree.currentRoot["city_rows"], zeros)
         return maximum, index1, index2
 
     def __addWayToResult(self, _matrix, row, column, city_rows, city_cols):
@@ -126,7 +128,8 @@ class TSPSolver:
 
         self.__findAndRemoveCycles(self.tree.currentRoot["right"])
         self.tree.availableNodes.append(self.tree.currentRoot["right"])
-        self.matrixCallback(2, matrix_, city_cols, city_rows)
+        if self.matrixCallback:
+            self.matrixCallback(2, matrix_, city_cols, city_rows)
 
     def __skipWay(self, matrix_, maxZero, row, col):
         new_matrix = deepcopy(matrix_)
@@ -147,7 +150,8 @@ class TSPSolver:
         }
         self.__findAndRemoveCycles(self.tree.currentRoot["left"])
         self.tree.availableNodes.append(self.tree.currentRoot["left"])
-        self.matrixCallback(3, new_matrix,  self.tree.currentRoot["city_cols"], self.tree.currentRoot["city_rows"])
+        if self.matrixCallback:
+            self.matrixCallback(3, new_matrix, self.tree.currentRoot["city_cols"], self.tree.currentRoot["city_rows"])
 
     def __findMinNode(self):
         minNode = self.tree.availableNodes[0]
@@ -155,7 +159,8 @@ class TSPSolver:
             if self.tree.availableNodes[i]["value"] < minNode["value"]:
                 minNode = self.tree.availableNodes[i]
         self.tree.availableNodes.remove(minNode)
-        self.graphCallback()
+        if self.graphCallback:
+            self.graphCallback()
         return minNode
 
     def __findAndRemoveCycles(self, node: dict):
